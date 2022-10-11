@@ -9,9 +9,9 @@ COMPANY = "Työpaikka"
 HOURS = "Työaika (jos työsuhteessa)"
 SEX = "Sukupuoli"
 EXPERIENCE = "Työkokemus"
-SALARY = "Kuukausipalkka (brutto, euroina)"
-LOCATION = "Missä kaupungissa työpaikkasi pääasiallinen toimisto sijaitsee?"
-LOCATION = "Sijainti"
+SALARY = "Kuukausipalkka"
+# LOCATION = "Missä kaupungissa työpaikkasi pääasiallinen toimisto sijaitsee?"
+LOCATION = "Kaupunki"
 
 # Define some constants for the names we need to fix
 GOFORE = "gofore"
@@ -33,13 +33,6 @@ def load_data() -> pd.DataFrame:
     """Load the data and do light preprocessing."""
     df = pd.read_csv("data/koodiklinikka.csv")
 
-    # Make column names nicer
-    df.rename(
-        columns={
-            "Missä kaupungissa työpaikkasi pääasiallinen toimisto sijaitsee?": LOCATION
-        },
-        inplace=True,
-    )
     df[COMPANY] = df[COMPANY].str.lower()
     # remove leading and trailing spaces
     df[COMPANY] = df[COMPANY].str.rstrip(" ").str.lstrip(" ")
@@ -48,6 +41,7 @@ def load_data() -> pd.DataFrame:
         {
             COMPANY: {
                 "mavericks software oy": MAVERICKS,
+                "mavericks software": MAVERICKS,
                 "siili solutions oyj": SIILI,
                 "siili solutions": SIILI,
                 "gofore oyj": GOFORE,
@@ -56,33 +50,14 @@ def load_data() -> pd.DataFrame:
         },
         inplace=True,
     )
+    df[COMPANY].iloc[df[COMPANY].isna()] = "-"
 
-    # reduce cardinality in genders..
-    df[SEX] = df[SEX].str.lower().str.rstrip(" ").str.lstrip(" ")
-    df[SEX].iloc[
-        df[SEX].isin(
-            [
-                "mies-oletettu",
-                "äijjjä",
-                "male",
-                "miesoletettu",
-                "m",
-                "ucceli",
-                "äiä",
-                "äijä",
-                "ukko",
-                "mies!",
-                "miäsh",
-                "miäs",
-                "jäbä",
-                "tylsä mies",
-            ]
-        )
-    ] = "mies"
-    df[SEX].iloc[df[SEX].isin(["naisoletettu"])] = "nainen"
+    df[LOCATION].iloc[df[LOCATION].isna()] = "-"
+
     df[SEX].iloc[~df[SEX].isin(["mies", "nainen"])] = "eos / muu"
 
     # drop rows where salary cannot be interpreted (easily)
+    df[SALARY] = df[SALARY].str.replace(",", ".")
     df[SALARY] = df[SALARY].apply(pd.to_numeric, errors="coerce")
     df = df[df[SALARY].notna()]
 
@@ -130,7 +105,7 @@ sex_dist_fig.update_layout(
 st.plotly_chart(sex_dist_fig, use_container_width=True)
 
 st.write("Palkkajakauma yritysten mukaan")
-company_filter = st.multiselect("Yritykset", options=df[COMPANY].unique())
+company_filter = st.multiselect("Yritykset", options=sorted(df[COMPANY].unique()))
 company_data = df[df[COMPANY].isin(company_filter)]
 company_dist_fig = px.histogram(
     company_data,
@@ -150,7 +125,7 @@ st.write(
     Palkkajakauma sijainnin mukaan.
     """
 )
-location_filter = st.multiselect("Sijainti", options=df[LOCATION].unique())
+location_filter = st.multiselect("Sijainti", options=sorted(df[LOCATION].unique()))
 location_data = df[df[LOCATION].isin(location_filter)]
 location_dist_fig = px.histogram(
     location_data,

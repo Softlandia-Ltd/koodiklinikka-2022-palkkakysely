@@ -1,7 +1,3 @@
-pylint
-black
-ipython
-pydocstyle
 plotly
 pandas
 streamlit
