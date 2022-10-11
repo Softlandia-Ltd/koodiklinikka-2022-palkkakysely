@@ -10,7 +10,6 @@ HOURS = "Työaika (jos työsuhteessa)"
 SEX = "Sukupuoli"
 EXPERIENCE = "Työkokemus"
 SALARY = "Kuukausipalkka"
-# LOCATION = "Missä kaupungissa työpaikkasi pääasiallinen toimisto sijaitsee?"
 LOCATION = "Kaupunki"
 
 # Define some constants for the names we need to fix
