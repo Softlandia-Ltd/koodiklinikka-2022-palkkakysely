@@ -80,8 +80,8 @@ st.write(
 st.write(
     """
     Putsasimme dataa ennen analyysiä. Korjasimme samaa tarkoittavat yhtiöiden
-    nimet sekä 10 eri tavoin kirjoitettua mies-sanaa. Palkkana on käytetty
-    ilmoitettuja kuukausituloja, eli muita tuloja ei tässä vaiheessa huomioida.
+    nimet. Palkkana on käytetty ilmoitettuja kuukausituloja, eli muita tuloja
+    ei tässä vaiheessa huomioida.
     """
 )
 st.write("Kevyesti putsattu data:")
